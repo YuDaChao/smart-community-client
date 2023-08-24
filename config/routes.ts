@@ -29,6 +29,12 @@ export default [
     component: './Dashboard',
   },
   {
+    path: '/service/audit',
+    name: '工作台',
+    icon: 'dashboard',
+    component: './Dashboard',
+  },
+  {
     path: '/',
     redirect: '/dashboard',
   },

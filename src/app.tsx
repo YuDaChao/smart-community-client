@@ -14,6 +14,8 @@ import {
 import React from 'react';
 import { AvatarDropdown, AvatarName } from './components/RightContent/AvatarDropdown';
 import { fixMenuIcon } from './utils/renderMenus';
+import CommunitySelect from './components/RightContent/CommunitySelect';
+import { ConfigProvider } from 'antd';
 const isDev = process.env.NODE_ENV === 'development';
 const loginPath = '/user/login';
 
@@ -56,7 +58,7 @@ export async function getInitialState(): Promise<{
 // ProLayout 支持的api https://procomponents.ant.design/components/layout
 export const layout: RunTimeLayoutConfig = ({ initialState, setInitialState }) => {
   return {
-    actionsRender: () => [],
+    actionsRender: () => [<CommunitySelect />],
     avatarProps: {
       src: initialState?.currentUser?.avatar,
       title: <AvatarName />,
@@ -138,19 +140,19 @@ export const layout: RunTimeLayoutConfig = ({ initialState, setInitialState }) =
   };
 };
 
-// export function rootContainer(container: React.ReactElement) {
-//   return React.createElement(
-//     ConfigProvider,
-//     {
-//       theme: {
-//         token: {
-//           colorPrimary: '#007C84',
-//         },
-//       },
-//     },
-//     container,
-//   );
-// }
+export function rootContainer(container: React.ReactElement) {
+  return React.createElement(
+    ConfigProvider,
+    {
+      theme: {
+        token: {
+          colorPrimary: '#6148cd',
+        },
+      },
+    },
+    container,
+  );
+}
 
 /**
  * @name request 配置，可以配置错误处理
