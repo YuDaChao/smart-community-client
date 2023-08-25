@@ -4,4 +4,6 @@ declare namespace API {
     data: T;
     message: string;
   };
+  type TableResponse<T> = Response<{ count: number; data: T[] }>;
+  type TableParams<T> = T & { current: number; pageSize: number };
 }

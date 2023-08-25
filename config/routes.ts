@@ -35,6 +35,17 @@ export default [
     component: './Dashboard',
   },
   {
+    path: '/resident',
+    name: '住户信息',
+    routes: [
+      {
+        path: '/resident/list',
+        name: '住户信息',
+        component: './Resident',
+      },
+    ],
+  },
+  {
     path: '/',
     redirect: '/dashboard',
   },

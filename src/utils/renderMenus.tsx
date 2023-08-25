@@ -14,7 +14,7 @@ export const fixMenuIcon = (menus: API.Menu[]): any => {
       id: menu.id,
       path: menu.menuPath || '',
       name: menu.menuName || '',
-      icon: React.cloneElement(<Icon type={`icon-${menu.menuIcon}`} />),
+      icon: menu.menuIcon ? React.cloneElement(<Icon type={`icon-${menu.menuIcon}`} />) : '',
       routes: fixMenuIcon(menu.children),
     };
   });

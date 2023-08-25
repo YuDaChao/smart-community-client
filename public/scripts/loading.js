@@ -43,7 +43,7 @@
           margin: 0;
           padding: 0;
           color: rgba(0, 0, 0, 0.65);
-          color: #1890ff;
+          color: #6148cd;
           font-size: 14px;
           font-variant: tabular-nums;
           line-height: 1.5;
