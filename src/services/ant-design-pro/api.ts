@@ -22,6 +22,13 @@ export async function getCurrentUserMenus(params: { roleId: number }) {
   });
 }
 
+export async function refreshToken(data: { refreshToken: string }) {
+  return request<API.LoginResult>('/api/auth/refresh', {
+    method: 'POST',
+    data,
+  });
+}
+
 /** 退出登录接口 POST /api/login/outLogin */
 export async function outLogin(options?: { [key: string]: any }) {
   return request<Record<string, any>>('/api/login/outLogin', {
