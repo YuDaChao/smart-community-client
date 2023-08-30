@@ -1,0 +1,32 @@
+.dashboard {
+  .headerOverview {
+    .ant-pro-card-body {
+      display: flex;
+      align-items: center;
+      justify-content: space-around;
+    }
+    &Item {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      &Title {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        img {
+          width: 32px;
+          height: 32px;
+        }
+        .ant-typography {
+          font-size: 14px;
+          color: #666666;
+        }
+      }
+      .count {
+        font-size: 22px;
+        font-weight: 500;
+        color: rgba(0, 0, 0, 0.85);
+      }
+    }
+  }
+}

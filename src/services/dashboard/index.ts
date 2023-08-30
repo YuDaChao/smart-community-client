@@ -5,7 +5,7 @@ import { request } from '@umijs/max';
  * @param communityId 小区 id
  * @returns
  */
-export async function getResidentOverview(communityId: number) {
+export async function getResidentOverview(communityId?: number) {
   return request<API.Response<API.ResidentOverview>>('/api/dashboard/resident', {
     method: 'GET',
     params: { communityId },
