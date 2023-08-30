@@ -1,78 +1,70 @@
-﻿import type { RequestOptions } from '@@/plugin-request/request';
+﻿import { refreshToken } from '@/services/ant-design-pro/api';
+import type { RequestOptions } from '@@/plugin-request/request';
+import { request } from '@umijs/max';
 import type { RequestConfig } from '@umijs/max';
-import { message, notification } from 'antd';
+import { message } from 'antd';
 
-// 错误处理方案： 错误类型
-enum ErrorShowType {
-  SILENT = 0,
-  WARN_MESSAGE = 1,
-  ERROR_MESSAGE = 2,
-  NOTIFICATION = 3,
-  REDIRECT = 9,
+interface PendingTask {
+  config: any;
+  resolve: (data: any) => void;
 }
-// 与后端约定的响应数据格式
-interface ResponseStructure {
-  success: boolean;
-  data: any;
-  errorCode?: number;
-  errorMessage?: string;
-  showType?: ErrorShowType;
-}
+
+let isRefreshing = false;
+const queue: PendingTask[] = [];
+
+const refreshAccessToken = async () => {
+  const token = window.localStorage.getItem('refreshAccessToken');
+  if (token) {
+    const res = await refreshToken({ refreshToken: token });
+    if (res.code === 200) {
+      window.localStorage.setItem('accessToken', res.data.accessToken);
+      window.localStorage.setItem('refreshAccessToken', res.data.refreshAccessToken);
+    }
+    return res;
+  }
+  return null;
+};
 
 /**
- * @name 错误处理
+ * @name
  * pro 自带的错误处理， 可以在这里做自己的改动
  * @doc https://umijs.org/docs/max/request#配置
  */
 export const errorConfig: RequestConfig = {
   // 错误处理： umi@3 的错误处理方案。
   errorConfig: {
-    // 错误抛出
-    errorThrower: (res) => {
-      const { success, data, errorCode, errorMessage, showType } =
-        res as unknown as ResponseStructure;
-      if (!success) {
-        const error: any = new Error(errorMessage);
-        error.name = 'BizError';
-        error.info = { errorCode, errorMessage, showType, data };
-        throw error; // 抛出自制的错误
-      }
-    },
     // 错误接收及处理
-    errorHandler: (error: any, opts: any) => {
+    errorHandler: async (error: any, opts: any) => {
       if (opts?.skipErrorHandler) throw error;
+      const { response, config } = error;
       // 我们的 errorThrower 抛出的错误。
-      if (error.name === 'BizError') {
-        const errorInfo: ResponseStructure | undefined = error.info;
-        if (errorInfo) {
-          const { errorMessage, errorCode } = errorInfo;
-          switch (errorInfo.showType) {
-            case ErrorShowType.SILENT:
-              // do nothing
-              break;
-            case ErrorShowType.WARN_MESSAGE:
-              message.warning(errorMessage);
-              break;
-            case ErrorShowType.ERROR_MESSAGE:
-              message.error(errorMessage);
-              break;
-            case ErrorShowType.NOTIFICATION:
-              notification.open({
-                description: errorMessage,
-                message: errorCode,
-              });
-              break;
-            case ErrorShowType.REDIRECT:
-              // TODO: redirect
-              break;
-            default:
-              message.error(errorMessage);
-          }
+      if (response) {
+        if (isRefreshing) {
+          return new Promise((resolve) => {
+            queue.push({
+              config,
+              resolve,
+            });
+          });
         }
-      } else if (error.response) {
         // Axios 的错误
         // 请求成功发出且服务器也响应了状态码，但状态代码超出了 2xx 的范围
-        message.error(`Response status:${error.response.status}`);
+        const accessTokenExpired = response.status === 401;
+        const isRefreshUrl = response.config.url !== '/api/refresh';
+        if (accessTokenExpired && isRefreshUrl) {
+          isRefreshing = true;
+          const res = await refreshAccessToken();
+          if (res && res.code === 200) {
+            queue.forEach(({ config, resolve }) => {
+              const { url, ...opts } = config;
+              resolve(request(url, opts));
+            });
+
+            const { url, ...opts } = config;
+            return request(url, opts);
+          }
+        }
+        message.error(`Response status: ${error.response.status}`);
       } else if (error.request) {
         // 请求已经成功发起，但没有收到响应
         // \`error.request\` 在浏览器中是 XMLHttpRequest 的实例，
@@ -99,11 +91,6 @@ export const errorConfig: RequestConfig = {
   responseInterceptors: [
     (response) => {
       // 拦截响应数据，进行个性化处理
-      const { data } = response as unknown as ResponseStructure;
-
-      if (data?.success === false) {
-        message.error('请求失败！');
-      }
       return response;
     },
   ],
