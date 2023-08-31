@@ -4,6 +4,7 @@ import type { Settings as LayoutSettings } from '@ant-design/pro-components';
 import { SettingDrawer } from '@ant-design/pro-components';
 import type { RunTimeLayoutConfig } from '@umijs/max';
 import { history, Link } from '@umijs/max';
+import { QueryClient, QueryClientProvider } from 'react-query';
 import defaultSettings from '../config/defaultSettings';
 import { errorConfig } from './requestErrorConfig';
 import {
@@ -15,6 +16,9 @@ import { AvatarDropdown, AvatarName } from './components/RightContent/AvatarDrop
 import { fixMenuIcon } from './utils/renderMenus';
 import CommunitySelect from './components/RightContent/CommunitySelect';
 import { ConfigProvider } from 'antd';
+
+const queryClient = new QueryClient();
+
 const isDev = process.env.NODE_ENV === 'development';
 const loginPath = '/user/login';
 
@@ -120,7 +124,7 @@ export const layout: RunTimeLayoutConfig = ({ initialState, setInitialState }) =
       // if (initialState?.loading) return <PageLoading />;
       return (
         <>
-          {children}
+          <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
           <SettingDrawer
             disableUrlParams
             enableDarkTheme

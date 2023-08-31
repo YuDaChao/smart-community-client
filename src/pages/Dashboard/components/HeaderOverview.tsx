@@ -1,13 +1,14 @@
 import { ProCard } from '@ant-design/pro-components';
 import { Skeleton, Space, Typography } from 'antd';
 
-import iconUser from '../images/icon-house.png';
+import iconUser from '../images/icon-user.png';
 import iconHouse from '../images/icon-house.png';
 import iconBuilding from '../images/icon-building.png';
 import iconVerify from '../images/icon-verify.png';
 import { FallOutlined, RiseOutlined } from '@ant-design/icons';
 import { useModel, useRequest } from '@umijs/max';
 import { getResidentOverview } from '@/services/dashboard';
+import { useHeaderOverview } from '../hooks';
 
 const { Text } = Typography;
 
@@ -45,19 +46,22 @@ const HeaderOverviewItem = (props: HeaderOverviewItemProps) => {
 
 const HeaderOverview = () => {
   const { communityId } = useModel('community');
-  const { data, loading } = useRequest(() => getResidentOverview(communityId), {
-    refreshDeps: [communityId],
-  });
+
+  const { data, isLoading } = useHeaderOverview(communityId);
 
   const {
     residentCount = 0,
     lastResidentCount = 0,
     tenantCount = 0,
     lastTenantCount = 0,
-  } = data || {};
+    occupancyRate = 0,
+    hire = 0,
+    idle = 0,
+    selfOccupied = 0,
+  } = data?.data || {};
 
   return (
-    <ProCard loading={loading} className="headerOverview">
+    <ProCard loading={isLoading} className="headerOverview">
       <HeaderOverviewItem
         icon={iconUser}
         title="小区入住人数"
@@ -75,14 +79,14 @@ const HeaderOverview = () => {
       <HeaderOverviewItem
         icon={iconVerify}
         title="小区入住率"
-        value={data?.occupancyRate}
+        value={occupancyRate}
         type="up"
         typeValue={1.3}
       />
       <HeaderOverviewItem
         icon={iconBuilding}
         title="房屋数"
-        value={(data?.hire || 0) + (data?.idle || 0) + (data?.selfOccupied || 0)}
+        value={hire + idle + selfOccupied}
         type="up"
         typeValue={129}
       />

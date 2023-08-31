@@ -9,6 +9,8 @@ body,
     'Noto Color Emoji';
 }
 
+@primaryColor: #6148cd;
+
 .colorWeak {
   filter: invert(80%);
 }
@@ -53,6 +55,17 @@ ol {
 }
 
 // reset
+a.ant-typography {
+  color: @primaryColor !important;
+  &:hover {
+    color: lighten(@primaryColor, 20%) !important;
+  }
+}
+.ant-pro-query-filter-collapse-button {
+  &:hover {
+    color: lighten(@primaryColor, 20%) !important;
+  }
+}
 // .ant-pro-global-header-header-actions-item > * {
 //   padding-block: 0 !important;
 // }
